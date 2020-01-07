@@ -41,9 +41,4 @@ if (\srag\DIC\UserTakeOver\DICStatic::dic()->database()->tableExists('ui_uihk_us
 	\srag\DIC\UserTakeOver\DICStatic::dic()->database()->dropTable('ui_uihk_usrto_config');
 }
 ?>
-<#5>
-<?php
-if(!\srag\DIC\UserTakeOver\DICStatic::dic()->database()->tableExists(ilUserTakeOverConfig::TABLE_NAME)) {
-	\ilUserTakeOverConfig::updateDB();
-}
-?>
+

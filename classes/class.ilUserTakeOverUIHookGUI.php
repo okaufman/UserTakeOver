@@ -70,7 +70,7 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
                 // If we are admin
                 /** Some Async requests wont instanciate rbacreview. Thus we just terminate. */
                 if ((self::dic()->rbacreview() instanceof ilRbacReview)
-                    && in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))
+                    && usrtoHelper::getInstance()->checkPluginAccess()
                 ) {
                     ///////////////// IN THE USER ADMINISTRATION /////////////////
                     $this->initTakeOverToolbar(self::dic()->toolbar());
@@ -107,7 +107,10 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
     protected function getTopBarHtml()
     {
         $template = self::plugin()->getPluginObject()->getTemplate("tpl.MMUserTakeOver.html", false, false);
-        if (in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))) {
+
+       if (usrtoHelper::getInstance()->checkPluginAccess()){
+
+        //if(in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))){
             $template->setVariable("SEARCHUSERLINK", self::dic()->ctrl()->getLinkTargetByClass([
                 ilUIPluginRouterGUI::class,
                 //ilUserTakeOverConfigGUI::class,
@@ -136,7 +139,7 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
             $groups_html = $this->getGroupsHtml($group_ids, self::dic()->user());
         }
         //only group members or user with admin role can use search
-        if (in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId())) || !empty($group_ids)) {
+        if (usrtoHelper::getInstance()->checkPluginAccess() || !empty($group_ids)) {
             $template->setCurrentBlock("DROPDOWN_TOGGLE");
             $template->setVariable("TOGGLE", "<a id=\"srag-toggle\" class=\"dropdown-toggle\"><span class=\"glyphicon glyphicon-eye-open\"><span class=\"caret\"></span></span></a>");
             $template->parseCurrentBlock();

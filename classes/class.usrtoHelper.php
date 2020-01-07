@@ -19,6 +19,7 @@ class usrtoHelper
     const USR_ID_BACKUP = 'usrtoOriginalAccountId';
     const USR_ID = 'usr_id';
     const PLUGIN_CLASS_NAME = ilUserTakeOverPlugin::class;
+    const USRTO_ROLE_NAME = 'UserTakeOver-User';
     /**
      * @var usrtoHelper
      */
@@ -157,12 +158,37 @@ class usrtoHelper
             return true;
         }
 
-        // If the user taking over is of id 13? or is not in the admin role he does not have permission.
-        if (!isset($usr_id) || $usr_id == 13 || !in_array(2, self::dic()->rbacreview()->assignedGlobalRoles($usr_id))) {
+        if(!$this->checkPluginAccess($usr_id)){
             ilUtil::sendFailure(self::plugin()->translate('no_permission'), true);
             ilUtil::redirect('login.php');
-
-            return false;
         }
     }
+
+    public  function checkPluginAccess($usr_id=null){
+        if (!isset($usr_id)) {
+            $usr_id = self::dic()->user()->getId();
+        }
+        // if user has the correct global role or he is an Administrator, he has permission to use the Plugin
+        $allowed_role=$this->getRoleAllowed();
+
+        $global_roles_of_user = self::dic()->rbacreview()->assignedGlobalRoles($usr_id);
+        $needles=array("2", $allowed_role);
+        // If the user taking over is of id 13? or is not in the admin role he does not have permission.
+        if (!isset($usr_id) || $usr_id == 13 || empty(array_intersect($needles, $global_roles_of_user))) {
+            return false;
+        }
+
+        return true;
+
+    }
+
+    protected function getRoleAllowed()
+    {
+        // roles named UserTakeOver-User are allowed to use the plugin
+        if(self::dic()->rbacreview()->roleExists(self::USRTO_ROLE_NAME)){
+            $roles= self::dic()->rbacreview()->getRolesByFilter(2,0, self::USRTO_ROLE_NAME);
+        }
+        return $roles[0]["obj_id"];
+    }
+
 }
