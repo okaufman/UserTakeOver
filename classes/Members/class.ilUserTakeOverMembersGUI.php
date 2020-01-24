@@ -175,7 +175,9 @@ class ilUserTakeOverMembersGUI
     protected function searchUsers()
     {
         // Only Administrators
-        if (!in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))) {
+
+        if (!usrtoHelper::getInstance()->checkPluginAccess(self::dic()->user()->getId()))
+        {
             //self::plugin()->output([], false);
             echo json_encode([]);
             exit;
@@ -200,7 +202,7 @@ class ilUserTakeOverMembersGUI
             ];
         }
 
-        //self::plugin()->output($result, false);
+
         echo json_encode($result);
         exit;
     }

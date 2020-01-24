@@ -59,6 +59,7 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
      */
     public function getHTML($a_comp, $a_part, $a_par = [])
     {
+        $user_id=self::dic()->user()->getId();
         if ($a_comp == 'Services/MainMenu' && $a_part == 'main_menu_search') {
             if (!self::isLoaded('user_take_over')) {
                 $html = '';
@@ -70,12 +71,12 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
                 // If we are admin
                 /** Some Async requests wont instanciate rbacreview. Thus we just terminate. */
                 if ((self::dic()->rbacreview() instanceof ilRbacReview)
-                    && in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))
+                    && usrtoHelper::getInstance()->checkPluginAccess($user_id)
                 ) {
                     ///////////////// IN THE USER ADMINISTRATION /////////////////
                     $this->initTakeOverToolbar(self::dic()->toolbar());
                 }
-                $html .= $this->getTopBarHtml();
+                $html .= $this->getTopBarHtml($user_id);
 
                 self::setLoaded('user_take_over'); // Main Menu gets called multiple times so we statically save that we already did all that is needed.
 
@@ -104,10 +105,12 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
      * @return array
      * @internal param $a_comp
      */
-    protected function getTopBarHtml()
+    protected function getTopBarHtml($user_id)
     {
         $template = self::plugin()->getPluginObject()->getTemplate("tpl.MMUserTakeOver.html", false, false);
-        if (in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId()))) {
+
+       if (usrtoHelper::getInstance()->checkPluginAccess($user_id)){
+
             $template->setVariable("SEARCHUSERLINK", self::dic()->ctrl()->getLinkTargetByClass([
                 ilUIPluginRouterGUI::class,
                 //ilUserTakeOverConfigGUI::class,
@@ -129,14 +132,14 @@ class ilUserTakeOverUIHookGUI extends ilUIHookPluginGUI
         }
 
         /////////// For the Groups //////////////////
-        $group_ids = usrtoMember::where(["user_id" => self::dic()->user()->getId()], "=")->getArray(null, "group_id");
+        $group_ids = usrtoMember::where(["user_id" => $user_id], "=")->getArray(null, "group_id");
 
         //if the current user is member of at least one group render the groups html
         if (!empty($group_ids)) {
             $groups_html = $this->getGroupsHtml($group_ids, self::dic()->user());
         }
         //only group members or user with admin role can use search
-        if (in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId())) || !empty($group_ids)) {
+        if (usrtoHelper::getInstance()->checkPluginAccess($user_id) || !empty($group_ids)) {
             $template->setCurrentBlock("DROPDOWN_TOGGLE");
             $template->setVariable("TOGGLE", "<a id=\"srag-toggle\" class=\"dropdown-toggle\"><span class=\"glyphicon glyphicon-eye-open\"><span class=\"caret\"></span></span></a>");
             $template->parseCurrentBlock();

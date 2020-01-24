@@ -44,6 +44,6 @@ if (\srag\DIC\UserTakeOver\DICStatic::dic()->database()->tableExists('ui_uihk_us
 <#5>
 <?php
 if(!\srag\DIC\UserTakeOver\DICStatic::dic()->database()->tableExists(ilUserTakeOverConfig::TABLE_NAME)) {
-	\ilUserTakeOverConfig::updateDB();
+    \ilUserTakeOverConfig::updateDB();
 }
 ?>
