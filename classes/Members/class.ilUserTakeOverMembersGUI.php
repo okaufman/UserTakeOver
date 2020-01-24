@@ -176,8 +176,7 @@ class ilUserTakeOverMembersGUI
     {
         // Only Administrators
 
-        if (!usrtoHelper::getInstance()->checkPluginAccess())
-       // if (!in_array(2, self::dic()->rbacreview()->assignedGlobalRoles(self::dic()->user()->getId())))
+        if (!usrtoHelper::getInstance()->checkPluginAccess(self::dic()->user()->getId()))
         {
             //self::plugin()->output([], false);
             echo json_encode([]);
@@ -203,7 +202,7 @@ class ilUserTakeOverMembersGUI
             ];
         }
 
-        //self::plugin()->output($result, false);
+
         echo json_encode($result);
         exit;
     }

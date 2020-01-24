@@ -164,10 +164,7 @@ class usrtoHelper
         }
     }
 
-    public  function checkPluginAccess($usr_id=null){
-        if (!isset($usr_id)) {
-            $usr_id = self::dic()->user()->getId();
-        }
+    public  function checkPluginAccess($usr_id):bool{
         // if user has the correct global role or he is an Administrator, he has permission to use the Plugin
         $allowed_role=$this->getRoleAllowed();
 
@@ -182,7 +179,7 @@ class usrtoHelper
 
     }
 
-    protected function getRoleAllowed()
+    protected function getRoleAllowed():string
     {
         // roles named UserTakeOver-User are allowed to use the plugin
         if(self::dic()->rbacreview()->roleExists(self::USRTO_ROLE_NAME)){
